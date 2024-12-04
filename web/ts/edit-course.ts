@@ -319,7 +319,7 @@ export function lectureEditor(lecture: Lecture): AlpineComponent {
          * Save changes send them to backend and commit change set.
          */
         async saveEdit() {
-            const { courseId, lectureId, name, description, lectureHallId, isChatEnabled, videoSections } =
+            const { courseId, lectureId, name, description, lectureHallId, isChatEnabled, isCustomThumbnailEnabled, videoSections } =
                 this.lectureData;
             const changedKeys = this.changeSet.changedKeys();
 
@@ -331,6 +331,7 @@ export function lectureEditor(lecture: Lecture): AlpineComponent {
                         description: changedKeys.includes("description") ? description : undefined,
                         lectureHallId: changedKeys.includes("lectureHallId") ? lectureHallId : undefined,
                         isChatEnabled: changedKeys.includes("isChatEnabled") ? isChatEnabled : undefined,
+                        isCustomThumbnailEnabled: changedKeys.includes("isCustomThumbnailEnabled") ? isCustomThumbnailEnabled : undefined,
                     },
                     options: {
                         saveSeries: this.uiEditMode === UIEditMode.series,

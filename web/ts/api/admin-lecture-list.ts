@@ -15,6 +15,7 @@ export interface UpdateLectureMetaRequest {
     description?: string;
     lectureHallId?: number;
     isChatEnabled?: boolean;
+    isCustomThumbnailEnabled?: boolean;
 }
 
 export class LectureFile {
@@ -167,6 +168,7 @@ export interface Lecture {
     hasStats: boolean;
     isChatEnabled: boolean;
     isConverting: boolean;
+    isCustomThumbnailEnabled: boolean;
     isLiveNow: boolean;
     isPast: boolean;
     isRecording: boolean;
