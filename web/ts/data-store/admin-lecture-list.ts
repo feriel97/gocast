@@ -232,4 +232,26 @@ export class AdminLectureListProvider extends StreamableMapProvider<number, Lect
     ) {
         await AdminLectureList.uploadVideo(courseId, lectureId, videoType, file, listener);
     }
+
+    async uploadThumbnail(courseId: number, lectureId: number, file: File) {
+
+            const res = await AdminLectureList.uploadThumbnailFile(courseId, lectureId, file);
+            const newFile = new LectureFile({
+                id: JSON.parse(res.responseText),
+                fileType: 2,
+                friendlyName: file.name,
+            });
+
+            this.data[courseId] = (await this.getData(courseId)).map((s) => {
+                if (s.lectureId === lectureId) {
+                    return {
+                        ...s,
+                        files: [...s.files, newFile],
+                    };
+                }
+                return s;
+            });
+            await this.triggerUpdate(courseId);
+
+    }
 }

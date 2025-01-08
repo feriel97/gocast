@@ -379,6 +379,22 @@
                         after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-indigo-600"></div>
                         <span class="ml-3 text-sm font-medium text-3">Upload Custom Thumbnail</span>
                     </label>
+                    <section>
+                        <article x-data="{ id: $id('text-input') }"
+                                 class="w-full">
+                            <label :for="id" class="hidden">Lecture description</label>
+                            <textarea :id="id"
+                                      @drop.prevent="(e) => onCustomThumbnailUpload(e)"
+                                      @dragover.prevent=""
+                                      class="tl-textarea grow"
+                                      placeholder="Drop thumbnail here."
+                                      autocomplete="off"
+                                      x-bind-change-set:description="changeSet"></textarea>
+                        </article>
+
+                    </section>
+                    <!--input type="file" id="thumbnailUpload" class="hidden" accept="image/*" @change="onAttachmentFileDrop"-->
+
                 </section>
 
 

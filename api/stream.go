@@ -50,6 +50,8 @@ func configGinStreamRestRouter(router *gin.Engine, daoWrapper dao.DaoWrapper) {
 				thumbs.GET(":fid", routes.getThumbs)
 				thumbs.GET("/live", routes.getLiveThumbs)
 				thumbs.GET("/vod", routes.getVODThumbs)
+				thumbs.POST("/customlive", routes.putCustomLiveThumbnail)
+				thumbs.POST("/customvod", routes.putCustomLiveThumbnail)
 			}
 		}
 		{
@@ -893,4 +895,46 @@ func (r streamRoutes) updateChatEnabled(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "could not update stream")
 		return
 	}
+}
+
+func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
+	tumLiveContext := c.MustGet("TUMLiveContext").(tools.TUMLiveContext)
+	streamID := tumLiveContext.Stream.ID
+	course := tumLiveContext.Course
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+		return
+	}
+
+	filename := file.Filename
+	fileUuid := uuid.NewV1()
+
+	filesFolder := fmt.Sprintf("%s/%s.%d/%s.%s/files",
+		tools.Cfg.Paths.Mass,
+		course.Name, course.Year,
+		course.Name, course.TeachingTerm)
+
+	path := fmt.Sprintf("%s/%s%s", filesFolder, fileUuid, filepath.Ext(filename))
+
+	//tempFilePath := pathprovider.LiveThumbnail(strconv.Itoa(int(streamID)))
+	if err := c.SaveUploadedFile(file, path); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	thumb := model.File{
+		StreamID: streamID,
+		Path:     path,
+		Filename: file.Filename,
+		Type:     model.FILETYPE_THUMB_CAM,
+	}
+
+	fileDao := dao.NewFileDao()
+	if err := fileDao.SetThumbnail(streamID, thumb); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to set thumbnail"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Thumbnail uploaded successfully"})
 }

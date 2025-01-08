@@ -267,6 +267,15 @@ export const AdminLectureList = {
             );
         }
 
+       /* if (request.isCustomThumbnailEnabled !== undefined) {
+            promises.push(
+                put(`/api/stream/${lectureId}/customThumbnail/enabled`, {
+                    lectureId,
+                    thumbnailFile: request.thumbnailFile,
+                }),
+            );
+        }*/
+
         const errors = (await Promise.all(promises)).filter((res) => res.status !== StatusCodes.OK);
         if (errors.length > 0) {
             console.error(errors);
@@ -372,6 +381,15 @@ export const AdminLectureList = {
         listener: PostFormDataListener = {},
     ) => {
         return await uploadFile(`/api/stream/${lectureId}/files?type=file`, file, listener);
+    },
+    uploadThumbnailFile: async (
+        courseId: number,
+        lectureId: number,
+        file: File,
+        listener: PostFormDataListener = {},
+    ) => {
+        return await uploadFile(`/api/stream/${lectureId}/thumbs/customlive`, file, listener);
+
     },
 
     /**

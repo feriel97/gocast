@@ -380,6 +380,22 @@ export function lectureEditor(lecture: Lecture): AlpineComponent {
             this.changeSet.commit({ discardKeys: this.videoFiles.map((v) => v.info.key) });
             this.uiEditMode = UIEditMode.none;
         },
+        onCustomThumbnailUpload(e){
+            if (e.dataTransfer.items) {
+            const item = e.dataTransfer.items[0];
+            const { kind } = item;
+            switch (kind) {
+                case "file": {
+                    DataStore.adminLectureList.uploadThumbnail(
+                        this.lectureData.courseId,
+                        this.lectureData.lectureId,
+                        item.getAsFile(),
+                    );
+                    break;
+                }
+
+            }
+        }},
     } as AlpineComponent;
 }
 
