@@ -50,7 +50,7 @@ func configGinStreamRestRouter(router *gin.Engine, daoWrapper dao.DaoWrapper) {
 				thumbs.GET(":fid", routes.getThumbs)
 				thumbs.GET("/live", routes.getLiveThumbs)
 				thumbs.GET("/vod", routes.getVODThumbs)
-				thumbs.POST("/customlive", routes.putCustomLiveThumbnail)
+				thumbs.POST("/", routes.putCustomLiveThumbnail)
 				thumbs.POST("/customvod", routes.putCustomLiveThumbnail)
 			}
 		}
