@@ -50,7 +50,7 @@ func configGinStreamRestRouter(router *gin.Engine, daoWrapper dao.DaoWrapper) {
 				thumbs.GET(":fid", routes.getThumbs)
 				thumbs.GET("/live", routes.getLiveThumbs)
 				thumbs.GET("/vod", routes.getVODThumbs)
-				thumbs.POST("/", routes.putCustomLiveThumbnail)
+				thumbs.POST("/", routes.putCustomLiveThumbnail) // TODO: change to admin only endpoint
 			}
 		}
 		{
@@ -178,8 +178,15 @@ func (r streamRoutes) getLiveThumbs(c *gin.Context) {
 	tumLiveContext := c.MustGet("TUMLiveContext").(tools.TUMLiveContext)
 
 	streamId := strconv.Itoa(int(tumLiveContext.Stream.ID))
-	path := pathprovider.LiveThumbnail(streamId)
-	c.File(path)
+
+	file, err := r.DaoWrapper.FileDao.GetThumbnail(tumLiveContext.Stream.ID, model.FILETYPE_THUMB_LG_CAM_PRES)
+	if err != nil {
+
+		path := pathprovider.LiveThumbnail(streamId)
+		c.File(path)
+	}
+	c.File(file.Path)
+
 }
 
 func (r streamRoutes) getSubtitles(c *gin.Context) {
@@ -934,10 +941,11 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 	}
 
 	thumb := model.File{
-		StreamID: streamID,
-		Path:     path,
-		Filename: file.Filename,
-		Type:     model.FILETYPE_THUMB_LG_CAM_PRES,
+		StreamID:   streamID,
+		Path:       path,
+		Filename:   file.Filename,
+		Type:       model.FILETYPE_THUMB_LG_CAM_PRES,
+		CourseName: course.Name,
 	}
 
 	if err := r.DaoWrapper.FileDao.SetThumbnail(streamID, thumb); err != nil {
