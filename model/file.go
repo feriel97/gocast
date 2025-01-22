@@ -28,10 +28,11 @@ const (
 type File struct {
 	gorm.Model
 
-	StreamID uint   `gorm:"not null"`
-	Path     string `gorm:"not null"`
-	Filename string
-	Type     FileType `gorm:"not null; default: 1"`
+	StreamID   uint   `gorm:"not null"`
+	Path       string `gorm:"not null"`
+	Filename   string
+	Type       FileType `gorm:"not null; default: 1"`
+	CourseName string   `gorm:"default: null"`
 }
 
 func (f File) GetDownloadFileName() string {
