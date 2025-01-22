@@ -914,12 +914,14 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 	filename := file.Filename
 	fileUuid := uuid.NewV1()
 
-	filesFolder := fmt.Sprintf("%s/%s.%d/%s.%s/files",
+	filesFolder := filepath.Join(
 		tools.Cfg.Paths.Mass,
-		course.Name, course.Year,
-		course.Name, course.TeachingTerm)
+		fmt.Sprintf("%s.%d.%s", course.Name, course.Year, course.TeachingTerm),
+		"files")
 
-	path := fmt.Sprintf("%s/%s%s", filesFolder, fileUuid, filepath.Ext(filename))
+	path := filepath.Join(
+		filesFolder,
+		fmt.Sprintf("%s%s", fileUuid, filepath.Ext(filename)))
 
 	//tempFilePath := pathprovider.LiveThumbnail(strconv.Itoa(int(streamID)))
 	if err := c.SaveUploadedFile(file, path); err != nil {
