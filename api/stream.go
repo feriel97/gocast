@@ -902,7 +902,12 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 	course := tumLiveContext.Course
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+		//c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+		_ = c.AbortWithError(http.StatusBadRequest, tools.RequestError{
+			Status:        http.StatusBadRequest,
+			CustomMessage: "Invalid file",
+			Err:           err,
+		})
 		return
 	}
 
@@ -918,7 +923,11 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 
 	//tempFilePath := pathprovider.LiveThumbnail(strconv.Itoa(int(streamID)))
 	if err := c.SaveUploadedFile(file, path); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		_ = c.AbortWithError(http.StatusInternalServerError, tools.RequestError{
+			Status:        http.StatusInternalServerError,
+			CustomMessage: "Failed to save file",
+			Err:           err,
+		})
 		return
 	}
 
@@ -931,7 +940,12 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 
 	fileDao := dao.NewFileDao()
 	if err := fileDao.SetThumbnail(streamID, thumb); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to set thumbnail"})
+
+		_ = c.AbortWithError(http.StatusInternalServerError, tools.RequestError{
+			Status:        http.StatusInternalServerError,
+			CustomMessage: "Failed to set thumbnail",
+			Err:           err,
+		})
 		return
 	}
 
