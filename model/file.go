@@ -22,6 +22,7 @@ const (
 	FILETYPE_THUMB_LG_CAM
 	FILETYPE_THUMB_LG_PRES
 	FILETYPE_THUMB_LG_CAM_PRES // generated from CAM and PRES, preferred over the others
+	FILETYPE_THUMB_CUSTOM
 )
 
 type File struct {
@@ -68,7 +69,7 @@ func (f File) GetVodTypeByName() string {
 }
 
 func (f File) IsThumb() bool {
-	return f.Type == FILETYPE_THUMB_CAM || f.Type == FILETYPE_THUMB_PRES || f.Type == FILETYPE_THUMB_COMB
+	return f.Type == FILETYPE_THUMB_CAM || f.Type == FILETYPE_THUMB_PRES || f.Type == FILETYPE_THUMB_COMB || f.Type == FILETYPE_THUMB_CUSTOM
 }
 
 func (f File) IsURL() bool {
