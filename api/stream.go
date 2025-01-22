@@ -935,7 +935,7 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 		StreamID: streamID,
 		Path:     path,
 		Filename: file.Filename,
-		Type:     model.FILETYPE_THUMB_CAM,
+		Type:     model.FILETYPE_THUMB_LG_CAM_PRES,
 	}
 
 	fileDao := dao.NewFileDao()
