@@ -938,8 +938,7 @@ func (r streamRoutes) putCustomLiveThumbnail(c *gin.Context) {
 		Type:     model.FILETYPE_THUMB_LG_CAM_PRES,
 	}
 
-	fileDao := dao.NewFileDao()
-	if err := fileDao.SetThumbnail(streamID, thumb); err != nil {
+	if err := r.DaoWrapper.FileDao.SetThumbnail(streamID, thumb); err != nil {
 
 		_ = c.AbortWithError(http.StatusInternalServerError, tools.RequestError{
 			Status:        http.StatusInternalServerError,
