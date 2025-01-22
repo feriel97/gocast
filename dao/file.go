@@ -14,6 +14,7 @@ type FileDao interface {
 	DeleteFile(id uint) error
 	CountVoDFiles() (int64, error)
 	SetThumbnail(streamId uint, thumb model.File) error
+	GetThumbnail(streamId uint, fileType model.FileType) (f model.File, err error)
 }
 
 type fileDao struct {
@@ -55,4 +56,9 @@ func (d fileDao) SetThumbnail(streamId uint, thumb model.File) error {
 		}
 		return tx.Create(&thumb).Error
 	})
+}
+
+func (d fileDao) GetThumbnail(streamId uint, fileType model.FileType) (f model.File, err error) {
+	err = DB.Where("stream_id = ? AND type = ?", streamId, fileType).First(&f).Error
+	return
 }
