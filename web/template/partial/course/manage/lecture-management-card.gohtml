@@ -370,29 +370,28 @@
                     </label>
                 </section>
                 <section>
-                    <label class="relative inline-flex items-center cursor-pointer left-3">
-                        <input type="checkbox" name="isCustomThumbnailEnabled" class="sr-only peer" x-bind-change-set="changeSet" />
+                    <label class="relative inline-flex items-center cursor-pointer left-3" x-data="{toggle: false}">
+                        <input type="checkbox" name="isCustomThumbnailEnabled" class="sr-only peer" x-bind-change-set="changeSet" @click="toggle =! toggle"/>
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-600
                         dark:peer-focus:ring-indigo-600 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full
                         peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px]
                         after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
                         after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-indigo-600"></div>
                         <span class="ml-3 text-sm font-medium text-3">Upload Custom Thumbnail</span>
+                        <textarea
+                                @drop.prevent="(e) => onCustomThumbnailUpload(e)"
+                                @dragover.prevent=""
+                                class="tl-textarea grow "
+                                placeholder="Drop thumbnail here."
+                                autocomplete="off"
+                                x-show="toggle">
+                     </textarea>
                     </label>
-                    <section>
-                        <article x-data="{ id: $id('text-input') }"
-                                 class="w-full">
-                            <label :for="id" class="hidden">Lecture description</label>
-                            <textarea :id="id"
-                                      @drop.prevent="(e) => onCustomThumbnailUpload(e)"
-                                      @dragover.prevent=""
-                                      class="tl-textarea grow"
-                                      placeholder="Drop thumbnail here."
-                                      autocomplete="off"
-                                      x-bind-change-set:description="changeSet"></textarea>
-                        </article>
+{{/*                    <article x-data="{ id: $id('text-input') }"*/}}
+{{/*                             class="w-full" >*/}}
 
-                    </section>
+{{/*                    </article>*/}}
+                </section>
                     <!--input type="file" id="thumbnailUpload" class="hidden" accept="image/*" @change="onAttachmentFileDrop"-->
 
                 </section>
