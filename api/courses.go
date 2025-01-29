@@ -152,7 +152,7 @@ func (r coursesRoutes) getLive(c *gin.Context) {
 		}
 		// only show "enrolled" streams to users which are enrolled or admins
 		if courseForLiveStream.Visibility == "enrolled" {
-			if !isUserAllowedToWatchPrivateCourse(courseForLiveStream, tumLiveContext.User) {
+			if !tumLiveContext.User.IsAllowedToWatchPrivateCourse(courseForLiveStream) {
 				continue
 			}
 		}
@@ -404,18 +404,6 @@ func (r coursesRoutes) getCourseBySlug(c *gin.Context) {
 	courseDTO.IsAdmin = isAdmin
 
 	c.JSON(http.StatusOK, courseDTO)
-}
-
-func isUserAllowedToWatchPrivateCourse(course model.Course, user *model.User) bool {
-	if user != nil {
-		for _, c := range user.Courses {
-			if c.ID == course.ID {
-				return true
-			}
-		}
-		return user.IsEligibleToWatchCourse(course)
-	}
-	return false
 }
 
 func (r coursesRoutes) createVOD(c *gin.Context) {
