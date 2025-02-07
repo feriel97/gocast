@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sethvargo/go-retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -17,6 +18,7 @@ import (
 	"github.com/tum-dev/gocast/runner/config"
 	"github.com/tum-dev/gocast/runner/pkg/actions"
 	"github.com/tum-dev/gocast/runner/pkg/netutil"
+	"github.com/tum-dev/gocast/runner/pkg/ptr"
 	"github.com/tum-dev/gocast/runner/pkg/vmstat"
 	"github.com/tum-dev/gocast/runner/protobuf"
 )
@@ -94,11 +96,33 @@ func (r *Runner) Run() {
 
 	r.RegisterWithGocast(5)
 	r.log.Info("successfully connected to gocast")
+	go func() {
+		t := time.NewTicker(5 * time.Second)
+		for range t.C {
+			r.notifications <- &protobuf.Notification{
+				Data: &protobuf.Notification_Heartbeat{
+					Heartbeat: &protobuf.HeartbeatNotification{
+						Hostname: ptr.Take(config.Config.Hostname),
+						Draining: ptr.Take(r.draining),
+						JobCount: ptr.Take(uint64(len(r.jobs))),
+					},
+				},
+			}
+		}
+	}()
 }
 
 func (r *Runner) Drain() {
 	r.log.Info("Runner set to drain.")
 	r.draining = true
+	r.notifications <- &protobuf.Notification{
+		Data: &protobuf.Notification_Heartbeat{
+			Heartbeat: &protobuf.HeartbeatNotification{
+				Hostname: ptr.Take(config.Config.Hostname),
+				Draining: ptr.Take(r.draining),
+			},
+		},
+	}
 }
 
 func (r *Runner) InitApiGrpc() {
@@ -152,7 +176,32 @@ func (r *Runner) RunAction(a []actions.Action, data map[string]any) string {
 }
 
 func (r *Runner) handleNotifications() {
+	b := retry.NewFibonacci(1 * time.Second)
+	b = retry.WithJitter(500*time.Millisecond, b)
+	b = retry.WithMaxRetries(10, b)
+
 	for n := range r.notifications {
-		r.log.Info("got notification", "notification", n)
+		go func() {
+			ctx := context.Background()
+			err := retry.Do(ctx, b, r.sendNotification(n))
+			if err != nil {
+				r.log.Error("failed to send notification", "error", err)
+			}
+		}()
+	}
+}
+
+func (r *Runner) sendNotification(notification *protobuf.Notification) func(ctx2 context.Context) error {
+	return func(ctx context.Context) error {
+		r.log.Debug("send notification", "notification", notification)
+		conn, err := r.dialIn()
+		if err != nil {
+			return retry.RetryableError(fmt.Errorf("send notification: %w", err))
+		}
+		_, err = conn.Notify(ctx, notification)
+		if err != nil {
+			return retry.RetryableError(fmt.Errorf("send notification: %w", err))
+		}
+		return nil
 	}
 }
