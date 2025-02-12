@@ -26,7 +26,9 @@ func (a *API) GetUser(ctx context.Context, req *emptypb.Empty) (*protobuf.GetUse
 		return nil, e.WithStatus(http.StatusUnauthorized, err)
 	}
 
-	resp := &protobuf.GetUserResponse{User: h.ParseUserToProto(user)}
+	resp := &protobuf.GetUserResponse{
+		User: h.ParseUserToProto(user),
+	}
 
 	return resp, nil
 }
@@ -35,12 +37,12 @@ func (a *API) GetUser(ctx context.Context, req *emptypb.Empty) (*protobuf.GetUse
 func (a *API) UpdateUserSettings(ctx context.Context, req *protobuf.UpdateUserSettingsRequest) (*protobuf.UpdateUserSettingsResponse, error) {
 	a.log.Info("UpdateUserSettings")
 
-	user, err := a.getCurrent(ctx)
+	u, err := a.getCurrent(ctx)
 	if err != nil {
 		return nil, e.WithStatus(http.StatusUnauthorized, err)
 	}
 
-	settings, err := h.UpdateUserSettings(a.db, user, req)
+	settings, err := h.UpdateUserSettings(a.db, u, req)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,9 @@ func (a *API) UpdateUserSettings(ctx context.Context, req *protobuf.UpdateUserSe
 		resp[i] = h.ParseUserSettingToProto(setting)
 	}
 
-	return &protobuf.UpdateUserSettingsResponse{UserSettings: resp}, nil
+	return &protobuf.UpdateUserSettingsResponse{
+		UserSettings: resp,
+	}, nil
 }
 
 // ResetPassword resets the password for the user with the given username.
