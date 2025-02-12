@@ -380,6 +380,19 @@ export function lectureEditor(lecture: Lecture): AlpineComponent {
             this.changeSet.commit({ discardKeys: this.videoFiles.map((v) => v.info.key) });
             this.uiEditMode = UIEditMode.none;
         },
+        previewThumbnail(e){
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.thumbnailSrc = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+        clearThumbnail(){
+            this.thumbnailSrc = "";
+        },
         onCustomThumbnailUpload(e){
             if (e.dataTransfer.items) {
             const item = e.dataTransfer.items[0];
@@ -395,6 +408,7 @@ export function lectureEditor(lecture: Lecture): AlpineComponent {
                 }
 
             }
+            this.previewThumbnail(e);
         }},
     } as AlpineComponent;
 }

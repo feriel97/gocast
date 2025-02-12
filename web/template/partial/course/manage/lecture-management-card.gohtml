@@ -370,7 +370,7 @@
                     </label>
                 </section>
             </div>
-                <section x-data="{upload: false}">
+                <section x-data="{upload: false, thumbnailSrc: ''}">
                     <label class="relative inline-flex items-center cursor-pointer left-3" >
                         <input type="checkbox" name="isCustomThumbnailEnabled" class="sr-only peer" x-bind-change-set="changeSet" @click="upload =! upload"/>
                         <div
@@ -390,7 +390,8 @@
                                 x-show="upload">
                             Drop thumbnail here.
                     </div>
-
+                    <img :src="thumbnailSrc" alt="Thumbnail Preview" class="mt-4" x-show="thumbnailSrc">
+                    <button @click="clearThumbnail" class="mt-2 px-4 py-2 bg-red-500 text-white rounded" x-show="thumbnailSrc">Clear Thumbnail</button>
 {{/*                    </label>*/}}
                 </section>
 {{/*                    <article x-data="{ id: $id('text-input') }"*/}}
